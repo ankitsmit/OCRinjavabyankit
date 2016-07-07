@@ -5,17 +5,48 @@
  */
 package ocrinjava;
 
-/**
- *
- * @author pragnesh
- */
+
+
+import org.junit.Test;
+import org.bytedeco.javacpp.*;
+import static org.bytedeco.javacpp.lept.*;
+import static org.bytedeco.javacpp.tesseract.*;
+import static org.junit.Assert.assertTrue;
+
 public class OCRInjava {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed() throws Exception {
+
     }
-    
+
+    public static void main(String args[]) {
+        try {
+            
+            BytePointer outText;
+
+            TessBaseAPI api = new TessBaseAPI();
+            // Initialize tesseract-ocr with English, without specifying tessdata path
+            if (api.Init(".", "ENG") != 0) {
+                System.err.println("Could not initialize tesseract.");
+                System.exit(1);
+            }
+
+            // Open input image with leptonica library
+            PIX image = pixRead("D:\\error1.bmp");
+            api.SetImage(image);
+            // Get OCR result
+            outText = api.GetUTF8Text();
+            String string = outText.getString();
+            assertTrue(!string.isEmpty());
+            System.out.println("OCR output:\n" + string);
+
+            // Destroy used object and release memory
+            api.End();
+            outText.deallocate();
+            pixDestroy(image);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }
